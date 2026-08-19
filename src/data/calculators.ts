@@ -94,19 +94,19 @@ export const CALCULATORS_REGISTRY: CalculatorItem[] = [
   },
   {
     id: 'rescisao-clt',
-    name: 'Calculadora de Rescisão CLT',
-    slug: 'rescisao-clt',
+    name: 'Calculadora de Rescisão Trabalhista',
+    slug: 'rescisao',
     category: 'Trabalhista',
     categorySlug: 'trabalhista',
-    shortDescription: 'Simule o valor estimado a receber na demissão sem justa causa, pedido ou acordo mútuo.',
-    keywords: ['rescisão', 'clt', 'demissão', 'fgts', 'aviso prévio', 'férias', '13 salário', 'trabalho'],
-    aliases: ['demissão', 'demitido', 'acordo', 'sair do emprego', 'acerto', 'verbas rescisórias', 'aviso prévio', 'demitida'],
+    shortDescription: 'Simule o valor estimado a receber na demissão sem justa causa, pedido, acordo ou término de contrato.',
+    keywords: ['rescisão', 'clt', 'demissão', 'fgts', 'aviso prévio', 'férias', '13 salário', 'trabalho', 'acerto', 'quanto vou receber'],
+    aliases: ['demissão', 'demitido', 'acordo', 'sair do emprego', 'acerto', 'acerto trabalhista', 'verbas rescisórias', 'aviso prévio', 'demitida', 'fui demitido', 'pedido de demissão', 'desligamento'],
     icon: 'FileText',
     featured: true,
     popular: true,
-    status: 'coming_soon',
+    status: 'active',
     updatedAt: '2026-08-19',
-    path: '/trabalhista/rescisao-clt'
+    path: '/trabalhista/rescisao'
   },
   {
     id: 'atualizacao-monetaria',

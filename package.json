@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test src/lib/calculators/__tests__/juros-compostos.test.ts"
+    "test": "tsx --test src/lib/calculators/__tests__/juros-compostos.test.ts src/lib/calculators/__tests__/rescisao-clt.test.ts"
   },
   "dependencies": {
     "lucide-react": "^0.453.0",
