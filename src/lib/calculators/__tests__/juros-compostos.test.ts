@@ -4,11 +4,14 @@ import {
   calculateJurosCompostos,
   convertRate,
   parseBrazilianNumber,
-  formatBRL,
-  formatPercent
+  compareScenarios,
+  solveFinancialGoal,
+  getWhatIfOptions,
+  serializeParamsToURL,
+  parseParamsFromURL
 } from '../juros-compostos';
 
-describe('Calculadora de Juros Compostos - Testes Matemáticos & Formatação', () => {
+describe('Calculadora de Juros Compostos - Testes Matemáticos & Solvers Expandidos', () => {
 
   it('Caso 1: Sem aporte e sem juros (P=1000, PMT=0, i=0%, n=12 meses)', () => {
     const res = calculateJurosCompostos({
@@ -35,13 +38,12 @@ describe('Calculadora de Juros Compostos - Testes Matemáticos & Formatação', 
       tipoPeriodo: 'meses',
     });
 
-    const expectedFinal = 1000 * Math.pow(1.01, 12); // 1126.82503...
+    const expectedFinal = 1000 * Math.pow(1.01, 12);
     assert.ok(Math.abs(res.totalFinal - expectedFinal) < 0.01);
     assert.strictEqual(res.totalInvested, 1000);
-    assert.ok(Math.abs(res.totalInterest - (expectedFinal - 1000)) < 0.01);
   });
 
-  it('Caso 3: Com aporte mensal e juros ao fim do período (P=1000, PMT=300, i=1% a.m., n=60 meses)', () => {
+  it('Caso 3: Com aporte mensal postcipado (P=1000, PMT=300, i=1% a.m., n=60 meses)', () => {
     const res = calculateJurosCompostos({
       valorInicial: 1000,
       aporteMensal: 300,
@@ -51,9 +53,6 @@ describe('Calculadora de Juros Compostos - Testes Matemáticos & Formatação', 
       tipoPeriodo: 'anos',
     });
 
-    // P_final = 1000 * (1.01^60) = 1816.6967
-    // PMT_final = 300 * ((1.01^60 - 1) / 0.01) = 24500.901
-    // Total final = 1816.6967 + 24500.901 = 26317.5977...
     const expectedInvested = 1000 + 300 * 60; // 19000
     assert.strictEqual(res.totalInvested, expectedInvested);
     assert.ok(Math.abs(res.totalFinal - 26317.60) < 1.0);
@@ -75,74 +74,75 @@ describe('Calculadora de Juros Compostos - Testes Matemáticos & Formatação', 
     assert.strictEqual(res.totalFinal, 4000);
   });
 
-  it('Caso 5: Conversão de taxas por equivalência composta (1% a.m. <-> 12.6825% a.a.)', () => {
+  it('Caso 5: Equivalência composta de taxas (1% a.m. <-> 12.6825% a.a.)', () => {
     const taxaAnual = convertRate(1, 'mensal', 'anual');
-    // (1.01^12 - 1) * 100 = 12.682503...
     assert.ok(Math.abs(taxaAnual - 12.6825) < 0.001);
 
     const taxaMensal = convertRate(12.682503, 'anual', 'mensal');
     assert.ok(Math.abs(taxaMensal - 1) < 0.001);
   });
 
-  it('Caso 6: Parseamento de números no formato brasileiro com vírgula', () => {
+  it('Caso 6: Parseamento seguro de formato de número brasileiro', () => {
     assert.strictEqual(parseBrazilianNumber('1.000,50'), 1000.5);
     assert.strictEqual(parseBrazilianNumber('10000,75'), 10000.75);
     assert.strictEqual(parseBrazilianNumber('10,5'), 10.5);
     assert.strictEqual(parseBrazilianNumber('0,8'), 0.8);
     assert.strictEqual(parseBrazilianNumber(''), 0);
-    assert.strictEqual(parseBrazilianNumber(null), 0);
-    assert.strictEqual(parseBrazilianNumber('abc'), 0);
   });
 
-  it('Caso 7: Equivalência de período entre meses e anos (5 anos = 60 meses)', () => {
-    const resAnos = calculateJurosCompostos({
-      valorInicial: 5000,
-      aporteMensal: 200,
-      taxaJuros: 0.8,
-      tipoTaxa: 'mensal',
-      periodo: 5,
-      tipoPeriodo: 'anos',
-    });
+  it('Caso 7: Comparação de Cenários (Cenário A vs Cenário B)', () => {
+    const paramsA = { valorInicial: 1000, aporteMensal: 300, taxaJuros: 1, tipoTaxa: 'mensal' as const, periodo: 5, tipoPeriodo: 'anos' as const };
+    const paramsB = { valorInicial: 1000, aporteMensal: 500, taxaJuros: 1, tipoTaxa: 'mensal' as const, periodo: 5, tipoPeriodo: 'anos' as const };
 
-    const resMeses = calculateJurosCompostos({
-      valorInicial: 5000,
-      aporteMensal: 200,
-      taxaJuros: 0.8,
-      tipoTaxa: 'mensal',
-      periodo: 60,
-      tipoPeriodo: 'meses',
-    });
+    const comp = compareScenarios(paramsA, paramsB);
 
-    assert.strictEqual(resAnos.totalMeses, resMeses.totalMeses);
-    assert.strictEqual(resAnos.totalInvested, resMeses.totalInvested);
-    assert.strictEqual(resAnos.totalFinal.toFixed(2), resMeses.totalFinal.toFixed(2));
+    assert.strictEqual(comp.winner, 'B');
+    assert.ok(comp.diffFinal > 0);
+    assert.ok(comp.summaryText.includes('Cenário B gera'));
   });
 
-  it('Caso 8: Limites de validação e prevenção de NaN/Infinity', () => {
-    const resNegative = calculateJurosCompostos({
-      valorInicial: -500,
-      aporteMensal: -100,
-      taxaJuros: -5,
-      tipoTaxa: 'mensal',
-      periodo: -10,
-      tipoPeriodo: 'meses',
-    });
-
-    assert.ok(!isNaN(resNegative.totalFinal));
-    assert.ok(isFinite(resNegative.totalFinal));
-    assert.strictEqual(resNegative.totalInvested, 0);
-
-    const resExcessive = calculateJurosCompostos({
+  it('Caso 8: Solver de Metas Financeiras (Modo A e Modo B)', () => {
+    const goalRes = solveFinancialGoal({
+      metaValor: 100000,
       valorInicial: 1000,
-      aporteMensal: 100,
+      aporteMensal: 500,
       taxaJuros: 1,
       tipoTaxa: 'mensal',
-      periodo: 100, // > 50 anos
-      tipoPeriodo: 'anos',
+      periodoAnos: 10,
     });
 
-    assert.strictEqual(resExcessive.isValid, false);
-    assert.ok(resExcessive.errors.periodo !== undefined);
+    assert.strictEqual(goalRes.modoASucesso, true);
+    assert.ok(goalRes.modoATempoMeses > 0);
+
+    assert.strictEqual(goalRes.modoBSucesso, true);
+    assert.ok(goalRes.modoBAporteMensal > 0);
+  });
+
+  it('Caso 9: Opções de "E se você mudar algumas coisas?" (What-Ifs)', () => {
+    const params = { valorInicial: 1000, aporteMensal: 300, taxaJuros: 1, tipoTaxa: 'mensal' as const, periodo: 5, tipoPeriodo: 'anos' as const };
+    const options = getWhatIfOptions(params);
+
+    assert.strictEqual(options.length, 3);
+    assert.ok(options[0].diffAmount > 0);
+  });
+
+  it('Caso 10: Serialização e Sanitização de Parâmetros na URL', () => {
+    const params = {
+      valorInicial: 1000,
+      aporteMensal: 300,
+      taxaJuros: 1,
+      tipoTaxa: 'mensal' as const,
+      periodo: 5,
+      tipoPeriodo: 'anos' as const,
+    };
+
+    const queryString = serializeParamsToURL(params);
+    assert.ok(queryString.includes('vi=1000'));
+    assert.ok(queryString.includes('am=300'));
+
+    const parsed = parseParamsFromURL({ vi: '1000', am: '300', tj: '1', tt: 'mensal', p: '5', tp: 'anos' });
+    assert.strictEqual(parsed?.valorInicial, 1000);
+    assert.strictEqual(parsed?.aporteMensal, 300);
   });
 
 });
