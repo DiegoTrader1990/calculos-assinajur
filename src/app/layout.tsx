@@ -13,11 +13,11 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://calculos.assinajur.com.br'),
   title: {
-    default: 'Cálculos AssinaJur - Simuladores Financeiros, Trabalhistas e Jurídicos',
-    template: '%s | Cálculos AssinaJur',
+    default: 'Cálculos por AssinaJur — Ferramentas e Simuladores Gratuitos',
+    template: '%s | Cálculos por AssinaJur',
   },
   description:
-    'Portal público de calculadoras simples, gratuitas e precisas. Simulação de juros compostos, rescisão trabalhista, atualização monetária e regras do INSS.',
+    'Portal público de calculadoras simples, gratuitas e precisas para finanças, trabalho, previdência, jurídico, imóveis e empresas.',
   keywords: [
     'calculadora',
     'juros compostos',
@@ -25,12 +25,22 @@ export const metadata: Metadata = {
     'atualização monetária',
     'simulador financeiro',
     'cálculo de rescisão',
-    'assinajur'
+    'assinajur',
+    'inss',
+    'financiamento'
   ],
   authors: [{ name: 'AssinaJur' }],
   robots: {
     index: true,
     follow: true,
+  },
+  openGraph: {
+    title: 'Cálculos por AssinaJur',
+    description: 'Portal público de calculadoras simples, gratuitas e precisas para finanças, trabalho, previdência, jurídico e empresas.',
+    url: 'https://calculos.assinajur.com.br',
+    siteName: 'Cálculos por AssinaJur',
+    locale: 'pt_BR',
+    type: 'website',
   },
 };
 

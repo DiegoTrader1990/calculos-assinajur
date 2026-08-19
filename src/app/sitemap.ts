@@ -11,6 +11,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 1.0,
     },
+    {
+      url: `${baseUrl}/calculadoras`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
   ];
 
   // Add Categories
@@ -23,11 +29,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  // Add Calculators
+  // Add Calculators (Only active ones)
   CALCULATORS_REGISTRY.forEach((calc) => {
     if (calc.status === 'active') {
       routes.push({
-        url: `${baseUrl}/${calc.categorySlug}/${calc.slug}`,
+        url: `${baseUrl}${calc.path}`,
         lastModified: new Date(calc.updatedAt),
         changeFrequency: 'weekly',
         priority: 0.9,

@@ -24,7 +24,7 @@ export default function CategoryGrid() {
           </h2>
         </div>
         <p className="text-sm text-slate-500 max-w-md">
-          Organizado em categorias intuitivas para você encontrar exatamente o que precisa em poucos cliques.
+          Selecione a categoria desejada para ver todas as calculadoras e simuladores específicos daquela área.
         </p>
       </div>
 
@@ -36,8 +36,9 @@ export default function CategoryGrid() {
           ).length;
 
           return (
-            <div
+            <Link
               key={cat.slug}
+              href={`/${cat.slug}`}
               className="group bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-sky-300 transition-all flex flex-col justify-between"
             >
               <div>
@@ -59,15 +60,12 @@ export default function CategoryGrid() {
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <Link
-                  href={`/#categorias`}
-                  className="text-xs font-bold text-sky-600 group-hover:text-sky-700 flex items-center gap-1"
-                >
-                  Explorar área
+                <span className="text-xs font-bold text-sky-600 group-hover:text-sky-700 flex items-center gap-1">
+                  Ver ferramentas de {cat.name}
                   <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                </span>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
