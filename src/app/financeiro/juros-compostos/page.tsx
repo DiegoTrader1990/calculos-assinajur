@@ -102,9 +102,6 @@ export default function JurosCompostosPage({ searchParams }: PageProps) {
 
   const methodology = (
     <>
-      <p className="font-semibold text-slate-800">
-        Como calculamos os juros compostos?
-      </p>
       <p>
         O cálculo utiliza a fórmula de capitalização composta somada à série de pagamentos uniformes com aportes no final de cada mês (postcipados):
       </p>
@@ -146,6 +143,7 @@ export default function JurosCompostosPage({ searchParams }: PageProps) {
         calculator={calculator}
         breadcrumbs={breadcrumbs}
         introduction="Simule aportes, juros e veja como seu patrimônio pode evoluir ao longo do tempo."
+        methodologyTitle="Como calculamos os juros compostos?"
         methodology={methodology}
         examples={examples}
         faqs={faqs}

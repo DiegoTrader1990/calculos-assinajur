@@ -3,7 +3,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import AllCalculatorsView from '@/components/AllCalculatorsView';
 
 export const metadata: Metadata = {
-  title: 'Todas as Calculadoras e Simuladores Gratuito',
+  title: 'Todas as Calculadoras e Simuladores Gratuitos',
   description: 'Lista completa de calculadoras financeiras, rescisões trabalhistas, atualização monetária judicial, simuladores de aposentadoria e imobiliários.',
   alternates: {
     canonical: 'https://calculos.assinajur.com.br/calculadoras',

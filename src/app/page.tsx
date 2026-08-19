@@ -1,8 +1,17 @@
+import { Metadata } from 'next';
 import SearchHero from '@/components/SearchHero';
 import CategoryGrid from '@/components/CategoryGrid';
 import PopularCalculators from '@/components/PopularCalculators';
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Zap, Lock } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Calculadoras Gratuitas — Financeiro, Trabalhista, Jurídico e Previdenciário',
+  description: 'Simuladores e calculadoras gratuitas para juros compostos, rescisão CLT, aposentadoria INSS, atualização monetária e muito mais. Resultados instantâneos, sem cadastro.',
+  alternates: {
+    canonical: 'https://calculos.assinajur.com.br',
+  },
+};
 
 export default function HomePage() {
   return (
@@ -53,7 +62,7 @@ export default function HomePage() {
               <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-4">
                 <Lock className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-900 text-lg mb-2">Privacidade Total</h3>
+              <h3 className="font-bold text-slate-900 text-lg mb-2">Processamento Local</h3>
               <p className="text-sm text-slate-500 leading-relaxed">
                 Os valores inseridos são processados diretamente na memória do seu navegador. Nenhum dado é armazenado.
               </p>

@@ -23,6 +23,9 @@ const config: Config = {
           700: '#1f2937',
         }
       },
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', '-apple-system', 'sans-serif'],
+      },
     },
   },
   plugins: [],

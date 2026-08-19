@@ -18,6 +18,7 @@ interface CalculatorTemplateProps {
   calculator: CalculatorItem;
   breadcrumbs: BreadcrumbItem[];
   introduction: string;
+  methodologyTitle?: string;
   methodology: React.ReactNode;
   examples?: ExampleItem[];
   faqs?: FAQItem[];
@@ -29,6 +30,7 @@ export default function CalculatorTemplate({
   calculator,
   breadcrumbs,
   introduction,
+  methodologyTitle = 'Metodologia de Cálculo',
   methodology,
   examples,
   faqs,
@@ -82,7 +84,7 @@ export default function CalculatorTemplate({
               <BookOpen className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-slate-900">
-              Como calculamos os juros compostos?
+              {methodologyTitle}
             </h2>
           </div>
           <div className="prose prose-slate max-w-none text-sm text-slate-600 leading-relaxed space-y-3">

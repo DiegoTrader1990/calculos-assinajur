@@ -23,7 +23,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/80 px-3 py-2 rounded-lg border border-slate-700/60 w-fit">
               <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-              Cálculos processados no navegador. Total privacidade.
+              Os valores informados são processados localmente no seu navegador.
             </div>
           </div>
 
@@ -56,10 +56,10 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-white text-xs tracking-wider uppercase mb-4">Institucional</h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
-              <li><span className="text-slate-500 cursor-default">Sobre a Plataforma</span></li>
-              <li><span className="text-slate-500 cursor-default">Termos de Uso</span></li>
-              <li><span className="text-slate-500 cursor-default">Política de Privacidade</span></li>
-              <li><span className="text-slate-500 cursor-default">Contato & Suporte</span></li>
+              <li><span className="text-slate-600 cursor-default">Sobre a Plataforma <span className="text-slate-600/50 text-[10px]">(em breve)</span></span></li>
+              <li><span className="text-slate-600 cursor-default">Termos de Uso <span className="text-slate-600/50 text-[10px]">(em breve)</span></span></li>
+              <li><span className="text-slate-600 cursor-default">Política de Privacidade <span className="text-slate-600/50 text-[10px]">(em breve)</span></span></li>
+              <li><span className="text-slate-600 cursor-default">Contato & Suporte <span className="text-slate-600/50 text-[10px]">(em breve)</span></span></li>
             </ul>
           </div>
 
