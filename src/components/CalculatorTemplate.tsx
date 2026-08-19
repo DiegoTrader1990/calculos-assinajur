@@ -32,7 +32,7 @@ export default function CalculatorTemplate({
   methodology,
   examples,
   faqs,
-  disclaimer = 'Os resultados fornecidos por esta calculadora são simulações matemáticas para fins informativos e educativos. Não constituem aconselhamento legal, fiscal ou financeiro formal.',
+  disclaimer = 'Esta ferramenta possui finalidade informativa e educacional. Os resultados são estimativas baseadas nos dados informados pelo usuário e não representam garantia de rentabilidade ou recomendação de investimento.',
   children
 }: CalculatorTemplateProps) {
   return (
@@ -50,7 +50,7 @@ export default function CalculatorTemplate({
             </span>
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              100% Confiável & Gratuito
+              Gratuito • Cálculo transparente
             </span>
           </div>
 
@@ -69,7 +69,7 @@ export default function CalculatorTemplate({
         </div>
 
         {/* Calculation Interactive Form & Results Slot */}
-        <div className="mb-12">
+        <div className="mb-10">
           {children}
         </div>
 
@@ -80,7 +80,7 @@ export default function CalculatorTemplate({
               <BookOpen className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-slate-900">
-              Como funciona o cálculo e metodologia
+              Como calculamos os juros compostos?
             </h2>
           </div>
           <div className="prose prose-slate max-w-none text-sm text-slate-600 leading-relaxed space-y-3">
