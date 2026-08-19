@@ -20,20 +20,18 @@ import {
   TrendingUp,
   Layers,
   Info,
-  CheckCircle2,
   BarChart2,
   Copy,
   Share2,
   Check,
   Target,
   Sparkles,
-  HelpCircle,
   History,
   Trash2,
   ChevronDown,
   ChevronUp,
-  ArrowRight,
-  Split
+  Split,
+  Zap
 } from 'lucide-react';
 
 interface JurosCompostosCalculatorProps {
@@ -241,16 +239,16 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
       
       {/* Banner de Restauração de Último Cálculo */}
       {lastSavedCalc && !initialSearchParams && (
-        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center justify-between gap-4 text-xs">
+        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center justify-between gap-4 text-xs shadow-xs">
           <div className="flex items-center gap-2 text-sky-900">
             <History className="w-4 h-4 text-sky-600 flex-shrink-0" />
             <span>
-              <strong>Continuar seu último cálculo:</strong> {lastSavedCalc.label} (Salvo localmente em {lastSavedCalc.date})
+              <strong>Continuar seu último cálculo:</strong> {lastSavedCalc.label} (Salvo em {lastSavedCalc.date})
             </span>
           </div>
           <button
             onClick={() => handleRestoreLast(lastSavedCalc.params)}
-            className="px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold hover:bg-sky-700 transition-colors flex-shrink-0"
+            className="px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold hover:bg-sky-700 transition-colors flex-shrink-0 shadow-xs"
           >
             Carregar
           </button>
@@ -259,7 +257,9 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
 
       {/* Main Parameters Card */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
-        <div className="flex items-center justify-between pb-5 mb-6 border-b border-slate-100">
+        
+        {/* Superior Header & Mode Toggle Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-slate-100 gap-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
               <Calculator className="w-5 h-5" />
@@ -269,7 +269,38 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             </h2>
           </div>
           
-          <div className="flex items-center gap-2">
+          {/* Action Buttons Header */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => {
+                setShowCompareMode(!showCompareMode);
+                setShowGoalsWidget(false);
+              }}
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${
+                showCompareMode
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200/60'
+              }`}
+            >
+              <Split className="w-3.5 h-3.5" />
+              {showCompareMode ? 'Fechar Comparativo' : '⚡ Modo Comparar Cenários'}
+            </button>
+
+            <button
+              onClick={() => {
+                setShowGoalsWidget(!showGoalsWidget);
+                setShowCompareMode(false);
+              }}
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${
+                showGoalsWidget
+                  ? 'bg-amber-600 text-white shadow-md'
+                  : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60'
+              }`}
+            >
+              <Target className="w-3.5 h-3.5" />
+              {showGoalsWidget ? 'Fechar Metas' : '🎯 Simular Meta'}
+            </button>
+
             {historyList.length > 0 && (
               <button
                 onClick={() => setShowHistoryDrawer(!showHistoryDrawer)}
@@ -280,6 +311,7 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
                 Histórico ({historyList.length})
               </button>
             )}
+            
             <button
               onClick={handleResetForm}
               className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-sky-600 transition-colors bg-slate-100 hover:bg-sky-50 px-3 py-1.5 rounded-lg"
@@ -292,42 +324,45 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
         </div>
 
         {/* Preset Quick Shortcuts */}
-        <div className="mb-6 flex items-center flex-wrap gap-2 text-xs font-semibold text-slate-500">
-          <span className="text-slate-400 mr-1">Atalhos rápidos:</span>
+        <div className="mb-6 p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center flex-wrap gap-2 text-xs font-semibold text-slate-600">
+          <span className="text-slate-500 font-bold flex items-center gap-1">
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            Cenários Rápidos:
+          </span>
           <button
-            onClick={() => { setPeriodoStr('5'); setTipoPeriodo('anos'); }}
-            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-100 hover:text-sky-700 transition-colors"
+            onClick={() => { setPeriodoStr('5'); setTipoPeriodo('anos'); handlePerformCalculation(); }}
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
           >
             5 Anos
           </button>
           <button
-            onClick={() => { setPeriodoStr('10'); setTipoPeriodo('anos'); }}
-            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-100 hover:text-sky-700 transition-colors"
+            onClick={() => { setPeriodoStr('10'); setTipoPeriodo('anos'); handlePerformCalculation(); }}
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
           >
             10 Anos
           </button>
           <button
-            onClick={() => { setPeriodoStr('20'); setTipoPeriodo('anos'); }}
-            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-100 hover:text-sky-700 transition-colors"
+            onClick={() => { setPeriodoStr('20'); setTipoPeriodo('anos'); handlePerformCalculation(); }}
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
           >
             20 Anos
           </button>
           <span className="text-slate-300">|</span>
           <button
-            onClick={() => setAporteMensalStr('100,00')}
-            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-100 hover:text-sky-700 transition-colors"
+            onClick={() => { setAporteMensalStr('100,00'); handlePerformCalculation(); }}
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
           >
             R$ 100/mês
           </button>
           <button
-            onClick={() => setAporteMensalStr('500,00')}
-            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-100 hover:text-sky-700 transition-colors"
+            onClick={() => { setAporteMensalStr('500,00'); handlePerformCalculation(); }}
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
           >
             R$ 500/mês
           </button>
           <button
-            onClick={() => setAporteMensalStr('1.000,00')}
-            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-100 hover:text-sky-700 transition-colors"
+            onClick={() => { setAporteMensalStr('1.000,00'); handlePerformCalculation(); }}
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
           >
             R$ 1.000/mês
           </button>
@@ -573,26 +608,6 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
                 {shareSuccess ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
                 {shareSuccess ? 'Link Copiado!' : 'Compartilhar'}
               </button>
-
-              <button
-                onClick={() => setShowCompareMode(!showCompareMode)}
-                className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors flex items-center gap-1.5 ${
-                  showCompareMode ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                }`}
-              >
-                <Split className="w-3.5 h-3.5" />
-                {showCompareMode ? 'Fechar Comparação' : 'Comparar Cenários'}
-              </button>
-
-              <button
-                onClick={() => setShowGoalsWidget(!showGoalsWidget)}
-                className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors flex items-center gap-1.5 ${
-                  showGoalsWidget ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
-                }`}
-              >
-                <Target className="w-3.5 h-3.5" />
-                {showGoalsWidget ? 'Fechar Metas' : 'Simular Metas'}
-              </button>
             </div>
           </div>
 
@@ -640,7 +655,7 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
 
           </div>
 
-          {/* Seção 11 e 12: Entenda seu resultado & Quanto os juros fizeram por você */}
+          {/* Entenda seu resultado & Quanto os juros fizeram por você */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs leading-relaxed text-slate-700">
               <h3 className="font-bold text-slate-900 text-sm mb-1 flex items-center gap-1.5">
@@ -691,10 +706,10 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             </div>
           </div>
 
-          {/* Seção 9: "E se você mudar algumas coisas?" (Quick What-Ifs) */}
+          {/* "E se você mudar algumas coisas?" (Quick What-Ifs) */}
           <div className="pt-6 border-t border-slate-100">
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3">
-              E se você mudar algumas coisas?
+              E se você mudar algumas coisas? (Testar outros cenários com 1 clique)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {whatIfOptions.map((opt) => (
@@ -707,7 +722,7 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
                     setPeriodoStr(String(opt.params.periodo));
                     handlePerformCalculation();
                   }}
-                  className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-sky-50 hover:border-sky-300 text-left transition-all group"
+                  className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-sky-50 hover:border-sky-300 text-left transition-all group shadow-2xs"
                 >
                   <span className="text-xs font-bold text-slate-800 block group-hover:text-sky-600 mb-0.5">
                     {opt.label}
