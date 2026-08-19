@@ -1,7 +1,7 @@
 import React from 'react';
 import Breadcrumbs, { BreadcrumbItem } from './Breadcrumbs';
 import { CalculatorItem } from '@/data/calculators';
-import { Calendar, ShieldAlert, HelpCircle, BookOpen, CheckCircle2 } from 'lucide-react';
+import { Calendar, BookOpen, HelpCircle, CheckCircle2 } from 'lucide-react';
 
 export interface FAQItem {
   question: string;
@@ -36,40 +36,42 @@ export default function CalculatorTemplate({
   children
 }: CalculatorTemplateProps) {
   return (
-    <div className="min-h-screen bg-slate-50/50 py-8">
+    <div className="min-h-screen bg-slate-50/50 py-6 sm:py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumb Navigation */}
         <Breadcrumbs items={breadcrumbs} />
 
-        {/* Header Title & Badges */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-100/70 px-3 py-1 rounded-md">
-              {calculator.category}
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Gratuito • Cálculo transparente
-            </span>
+        {/* Compact Header (40-50% mais baixo verticalmente) */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl px-5 py-4 sm:px-6 sm:py-5 border border-slate-200 shadow-sm mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-100/70 px-2.5 py-0.5 rounded-md">
+                {calculator.category}
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                Gratuito • Cálculo transparente
+              </span>
+            </div>
+
+            <div className="flex items-center text-[11px] text-slate-400 gap-1">
+              <Calendar className="w-3 h-3" />
+              <span>Atualizado em: {new Date(calculator.updatedAt).toLocaleDateString('pt-BR')}</span>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-3">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug mb-1">
             {calculator.name}
           </h1>
 
-          <p className="text-base text-slate-600 leading-relaxed font-normal max-w-3xl">
+          <p className="text-xs sm:text-sm text-slate-600 leading-normal max-w-3xl">
             {introduction}
           </p>
-
-          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center text-xs text-slate-400 gap-2">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Última atualização: {new Date(calculator.updatedAt).toLocaleDateString('pt-BR')}</span>
-          </div>
         </div>
 
-        {/* Calculation Interactive Form & Results Slot */}
-        <div className="mb-10">
+        {/* Interactive Calculator Component & Exploratory Sections */}
+        <div className="mb-8">
           {children}
         </div>
 
@@ -133,8 +135,7 @@ export default function CalculatorTemplate({
         {/* Disclaimer Notice */}
         {disclaimer && (
           <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-800 text-xs leading-relaxed flex items-start gap-3">
-            <ShieldAlert className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
+            <div className="font-semibold">
               <strong>Aviso Legal & Isenção de Responsabilidade:</strong> {disclaimer}
             </div>
           </div>

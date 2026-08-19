@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import CalculatorTemplate, { ExampleItem, FAQItem } from '@/components/CalculatorTemplate';
 import JurosCompostosCalculator from '@/components/calculators/JurosCompostos';
 import { getCalculatorBySlug } from '@/data/calculators';
-import { calculateJurosCompostos, formatBRL, formatPercent } from '@/lib/calculators/juros-compostos';
+import { calculateJurosCompostos, formatBRL } from '@/lib/calculators/juros-compostos';
 import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default function JurosCompostosPage({ searchParams }: PageProps) {
     { label: 'Calculadora de Juros Compostos' },
   ];
 
-  // EXEMPLOS MATEMÁTICOS CALCULADOS DINAMICAMENTE PELA MESMA ENGINE CENTRAL (Point 2 & Point 3)
+  // EXEMPLOS MATEMÁTICOS CALCULADOS DINAMICAMENTE PELA MESMA ENGINE CENTRAL
   const ex1Result = calculateJurosCompostos({
     valorInicial: 1000,
     aporteMensal: 300,
@@ -145,7 +145,7 @@ export default function JurosCompostosPage({ searchParams }: PageProps) {
       <CalculatorTemplate
         calculator={calculator}
         breadcrumbs={breadcrumbs}
-        introduction="Calcule a evolução do seu dinheiro ao longo do tempo. Simule o valor inicial, depósitos mensais regulares e veja a composição do seu patrimônio com a tabela periódica."
+        introduction="Simule aportes, juros e veja como seu patrimônio pode evoluir ao longo do tempo."
         methodology={methodology}
         examples={examples}
         faqs={faqs}

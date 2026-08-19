@@ -31,7 +31,9 @@ import {
   ChevronDown,
   ChevronUp,
   Split,
-  Zap
+  Zap,
+  ArrowRight,
+  Compass
 } from 'lucide-react';
 
 interface JurosCompostosCalculatorProps {
@@ -64,15 +66,16 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
   const [tabelaModo, setTabelaModo] = useState<'anual' | 'mensal'>('anual');
   const [showFormula, setShowFormula] = useState<boolean>(false);
 
+  // Progressive Disclosure: Abas ativas da seção "Explore seu cálculo"
+  const [activeExplorationTab, setActiveExplorationTab] = useState<'whatif' | 'compare' | 'goals' | null>('whatif');
+
   // MODO COMPARAR CENÁRIOS
-  const [showCompareMode, setShowCompareMode] = useState<boolean>(false);
   const [scenarioBValorInicial, setScenarioBValorInicial] = useState<string>('1.000,00');
   const [scenarioBAporteMensal, setScenarioBAporteMensal] = useState<string>('500,00');
   const [scenarioBTaxaJuros, setScenarioBTaxaJuros] = useState<string>('1,00');
   const [scenarioBPeriodo, setScenarioBPeriodo] = useState<string>('5');
 
   // METAS FINANCEIRAS
-  const [showGoalsWidget, setShowGoalsWidget] = useState<boolean>(false);
   const [metaValorStr, setMetaValorStr] = useState<string>('100.000,00');
 
   // HISTÓRICO LOCAL
@@ -230,8 +233,7 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
     setTipoTaxa('mensal');
     setPeriodoStr(defaultParams.periodo as string);
     setTipoPeriodo('anos');
-    setShowCompareMode(false);
-    setShowGoalsWidget(false);
+    setActiveExplorationTab('whatif');
   };
 
   return (
@@ -239,7 +241,7 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
       
       {/* Banner de Restauração de Último Cálculo */}
       {lastSavedCalc && !initialSearchParams && (
-        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center justify-between gap-4 text-xs shadow-xs">
+        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-3.5 flex items-center justify-between gap-4 text-xs shadow-2xs">
           <div className="flex items-center gap-2 text-sky-900">
             <History className="w-4 h-4 text-sky-600 flex-shrink-0" />
             <span>
@@ -248,18 +250,17 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
           </div>
           <button
             onClick={() => handleRestoreLast(lastSavedCalc.params)}
-            className="px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold hover:bg-sky-700 transition-colors flex-shrink-0 shadow-xs"
+            className="px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold hover:bg-sky-700 transition-colors flex-shrink-0"
           >
             Carregar
           </button>
         </div>
       )}
 
-      {/* Main Parameters Card */}
+      {/* 2. PARÂMETROS DA SIMULAÇÃO */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
         
-        {/* Superior Header & Mode Toggle Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-slate-100 gap-4">
+        <div className="flex items-center justify-between pb-5 mb-6 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
               <Calculator className="w-5 h-5" />
@@ -269,38 +270,7 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             </h2>
           </div>
           
-          {/* Action Buttons Header */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => {
-                setShowCompareMode(!showCompareMode);
-                setShowGoalsWidget(false);
-              }}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${
-                showCompareMode
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200/60'
-              }`}
-            >
-              <Split className="w-3.5 h-3.5" />
-              {showCompareMode ? 'Fechar Comparativo' : '⚡ Modo Comparar Cenários'}
-            </button>
-
-            <button
-              onClick={() => {
-                setShowGoalsWidget(!showGoalsWidget);
-                setShowCompareMode(false);
-              }}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${
-                showGoalsWidget
-                  ? 'bg-amber-600 text-white shadow-md'
-                  : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60'
-              }`}
-            >
-              <Target className="w-3.5 h-3.5" />
-              {showGoalsWidget ? 'Fechar Metas' : '🎯 Simular Meta'}
-            </button>
-
+          <div className="flex items-center gap-2">
             {historyList.length > 0 && (
               <button
                 onClick={() => setShowHistoryDrawer(!showHistoryDrawer)}
@@ -327,42 +297,42 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
         <div className="mb-6 p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center flex-wrap gap-2 text-xs font-semibold text-slate-600">
           <span className="text-slate-500 font-bold flex items-center gap-1">
             <Zap className="w-3.5 h-3.5 text-amber-500" />
-            Cenários Rápidos:
+            Atalhos:
           </span>
           <button
             onClick={() => { setPeriodoStr('5'); setTipoPeriodo('anos'); handlePerformCalculation(); }}
-            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 transition-colors shadow-2xs"
           >
             5 Anos
           </button>
           <button
             onClick={() => { setPeriodoStr('10'); setTipoPeriodo('anos'); handlePerformCalculation(); }}
-            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 transition-colors shadow-2xs"
           >
             10 Anos
           </button>
           <button
             onClick={() => { setPeriodoStr('20'); setTipoPeriodo('anos'); handlePerformCalculation(); }}
-            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 transition-colors shadow-2xs"
           >
             20 Anos
           </button>
           <span className="text-slate-300">|</span>
           <button
             onClick={() => { setAporteMensalStr('100,00'); handlePerformCalculation(); }}
-            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 transition-colors shadow-2xs"
           >
             R$ 100/mês
           </button>
           <button
             onClick={() => { setAporteMensalStr('500,00'); handlePerformCalculation(); }}
-            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 transition-colors shadow-2xs"
           >
             R$ 500/mês
           </button>
           <button
             onClick={() => { setAporteMensalStr('1.000,00'); handlePerformCalculation(); }}
-            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-colors shadow-2xs"
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-700 transition-colors shadow-2xs"
           >
             R$ 1.000/mês
           </button>
@@ -527,8 +497,8 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
           <span className="text-slate-400">Aportes efetuados ao final de cada período (postcipados).</span>
         </div>
 
-        {/* Botão de Recálculo */}
-        <div className="mt-5 pt-3 flex items-center justify-between">
+        {/* Action Button & Discrete Hint (Point 5) */}
+        <div className="mt-5 pt-3 flex flex-col sm:flex-row items-center justify-between gap-3">
           <button
             onClick={handlePerformCalculation}
             className="w-full sm:w-auto px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-md shadow-sky-600/20 transition-colors flex items-center justify-center gap-2"
@@ -536,6 +506,11 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             <Calculator className="w-4 h-4" />
             Calcular Juros Compostos
           </button>
+
+          {/* Discreta indicação pré-cálculo (Point 5) */}
+          <span className="text-xs text-slate-500 text-center sm:text-right font-medium">
+            💡 Depois do cálculo você poderá testar novos cenários, comparar e definir metas.
+          </span>
         </div>
 
       </div>
@@ -577,96 +552,382 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
         </div>
       )}
 
-      {/* Results Highlight Cards */}
+      {/* 3. RESULTADO PRINCIPAL & EXPLORE SEU CÁLCULO */}
       {hasCalculated && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-8">
-          
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-600" />
-              <h2 className="text-xl font-bold text-slate-900">
-                Resultado da Simulação
-              </h2>
-            </div>
+        <div className="space-y-8">
 
-            {/* Quick Action Buttons */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={handleCopySummary}
-                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors flex items-center gap-1.5"
-                title="Copiar texto resumo formatado"
-              >
-                {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                {copiedSuccess ? 'Copiado!' : 'Copiar Resultado'}
-              </button>
-
-              <button
-                onClick={handleShareURL}
-                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors flex items-center gap-1.5"
-                title="Gerar link compartilhável desta simulação"
-              >
-                {shareSuccess ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
-                {shareSuccess ? 'Link Copiado!' : 'Compartilhar'}
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Order Priority: (1) Valor Total Final, (2) Total Investido, (3) Total em Juros Ganhos */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* CARDS DE RESULTADO */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
             
-            {/* Valor Total Final (Order 1 on mobile, Order 3 on desktop) */}
-            <div className="order-1 md:order-3 p-5 rounded-2xl bg-slate-900 text-white shadow-lg shadow-slate-900/10 border border-slate-800 relative overflow-hidden">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Valor Total Final
-              </span>
-              <div className="text-3xl font-extrabold text-sky-400">
-                {formatBRL(resultA.totalFinal)}
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-emerald-600" />
+                <h2 className="text-xl font-bold text-slate-900">
+                  Resultado da Simulação
+                </h2>
               </div>
-              <span className="text-xs text-slate-400 mt-1.5 block font-medium">
-                Em {resultA.totalMeses} meses ({resultA.yearlyBreakdown.length} anos)
-              </span>
             </div>
 
-            {/* Valor Total Investido (Order 2 on mobile, Order 1 on desktop) */}
-            <div className="order-2 md:order-1 p-5 rounded-2xl bg-sky-50/70 border border-sky-100">
-              <span className="text-xs font-bold text-sky-800 uppercase tracking-wider block mb-1">
-                Valor Total Investido
-              </span>
-              <div className="text-2xl font-extrabold text-slate-900">
-                {formatBRL(resultA.totalInvested)}
+            {/* Mobile Order Priority: (1) Valor Total Final, (2) Total Investido, (3) Total em Juros Ganhos */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              
+              {/* Valor Total Final (Order 1 on mobile) */}
+              <div className="order-1 md:order-3 p-5 rounded-2xl bg-slate-900 text-white shadow-lg shadow-slate-900/10 border border-slate-800 relative overflow-hidden">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  Valor Total Final
+                </span>
+                <div className="text-3xl font-extrabold text-sky-400">
+                  {formatBRL(resultA.totalFinal)}
+                </div>
+                <span className="text-xs text-slate-400 mt-1.5 block font-medium">
+                  Em {resultA.totalMeses} meses ({resultA.yearlyBreakdown.length} anos)
+                </span>
               </div>
-              <span className="text-xs text-slate-500 mt-1 block">
-                {formatPercent(resultA.percentInvested, 1)} do valor total acumulado
-              </span>
+
+              {/* Valor Total Investido (Order 2 on mobile) */}
+              <div className="order-2 md:order-1 p-5 rounded-2xl bg-sky-50/70 border border-sky-100">
+                <span className="text-xs font-bold text-sky-800 uppercase tracking-wider block mb-1">
+                  Valor Total Investido
+                </span>
+                <div className="text-2xl font-extrabold text-slate-900">
+                  {formatBRL(resultA.totalInvested)}
+                </div>
+                <span className="text-xs text-slate-500 mt-1 block">
+                  {formatPercent(resultA.percentInvested, 1)} do valor total acumulado
+                </span>
+              </div>
+
+              {/* Total em Juros Ganhos (Order 3 on mobile) */}
+              <div className="order-3 md:order-2 p-5 rounded-2xl bg-emerald-50/70 border border-emerald-100">
+                <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">
+                  Total em Juros Ganhos
+                </span>
+                <div className="text-2xl font-extrabold text-emerald-700">
+                  +{formatBRL(resultA.totalInterest)}
+                </div>
+                <span className="text-xs text-emerald-600 font-semibold mt-1 block">
+                  +{formatPercent(resultA.percentInterest, 1)} gerados por juros
+                </span>
+              </div>
+
             </div>
 
-            {/* Total em Juros Ganhos (Order 3 on mobile, Order 2 on desktop) */}
-            <div className="order-3 md:order-2 p-5 rounded-2xl bg-emerald-50/70 border border-emerald-100">
-              <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">
-                Total em Juros Ganhos
-              </span>
-              <div className="text-2xl font-extrabold text-emerald-700">
-                +{formatBRL(resultA.totalInterest)}
+            {/* Visual Composition Progress Bar */}
+            <div className="space-y-2 pt-2">
+              <div className="flex justify-between text-xs font-bold text-slate-700">
+                <span>Composição do Saldo Final</span>
+                <span>
+                  {formatPercent(resultA.percentInvested, 0)} Investimento x {formatPercent(resultA.percentInterest, 0)} Juros
+                </span>
               </div>
-              <span className="text-xs text-emerald-600 font-semibold mt-1 block">
-                +{formatPercent(resultA.percentInterest, 1)} gerados por juros
-              </span>
+              <div className="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                <div
+                  style={{ width: `${Math.max(0, Math.min(100, resultA.percentInvested))}%` }}
+                  className="bg-sky-500 h-full transition-all duration-300"
+                  title="Total Investido"
+                />
+                <div
+                  style={{ width: `${Math.max(0, Math.min(100, resultA.percentInterest))}%` }}
+                  className="bg-emerald-500 h-full transition-all duration-300"
+                  title="Juros compostos acumulados"
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-6 text-xs text-slate-500 pt-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-sky-500"></span>
+                  <span>Total Investido ({formatBRL(resultA.totalInvested)})</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
+                  <span>Juros Ganhos ({formatBRL(resultA.totalInterest)})</span>
+                </div>
+              </div>
             </div>
 
           </div>
 
-          {/* Entenda seu resultado & Quanto os juros fizeram por você */}
+          {/* 4. SEÇÃO IMEDIATA "EXPLORE SEU CÁLCULO" (Point 2, 3, 4, 7, 9) */}
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6">
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-4">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2 text-white">
+                  <Compass className="w-6 h-6 text-sky-400" />
+                  Explore seu cálculo
+                </h2>
+                <p className="text-xs text-slate-300 mt-1">
+                  Agora veja o que você pode descobrir com esses números:
+                </p>
+              </div>
+            </div>
+
+            {/* 3 Access Cards Grid (Stacked on Mobile, 3 cols on Desktop) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              {/* Card 1: E se...? (com Prévia Contextual em Destaque) */}
+              <button
+                onClick={() => setActiveExplorationTab(activeExplorationTab === 'whatif' ? null : 'whatif')}
+                className={`p-5 rounded-2xl border text-left transition-all relative overflow-hidden group ${
+                  activeExplorationTab === 'whatif'
+                    ? 'bg-sky-600/30 border-sky-400 ring-2 ring-sky-400/50'
+                    : 'bg-slate-800/80 border-slate-700 hover:border-sky-500/60 hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-sky-300 bg-sky-950/80 px-2.5 py-1 rounded-md border border-sky-500/30">
+                    ⚡ E se...?
+                  </span>
+                  {activeExplorationTab === 'whatif' ? <ChevronUp className="w-4 h-4 text-sky-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </div>
+
+                <h3 className="font-bold text-base text-white mb-1">
+                  Simular Variações
+                </h3>
+
+                <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                  Teste o impacto de aportar +R$ 100, investir por +5 anos ou alterar a taxa.
+                </p>
+
+                {/* Contextual Dynamic Preview (Point 4) */}
+                {whatIfOptions[0] && (
+                  <div className="p-3 rounded-xl bg-slate-900/90 border border-sky-500/40 text-xs">
+                    <span className="text-[11px] font-semibold text-slate-400 block mb-1">
+                      E se você investir +R$ 100/mês?
+                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-300">Saldo: {formatBRL(whatIfOptions[0].newTotalFinal)}</span>
+                      <span className="font-extrabold text-emerald-400">+{formatBRL(whatIfOptions[0].diffAmount)}</span>
+                    </div>
+                  </div>
+                )}
+              </button>
+
+              {/* Card 2: Comparar cenários */}
+              <button
+                onClick={() => setActiveExplorationTab(activeExplorationTab === 'compare' ? null : 'compare')}
+                className={`p-5 rounded-2xl border text-left transition-all relative overflow-hidden group ${
+                  activeExplorationTab === 'compare'
+                    ? 'bg-indigo-600/30 border-indigo-400 ring-2 ring-indigo-400/50'
+                    : 'bg-slate-800/80 border-slate-700 hover:border-indigo-500/60 hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-300 bg-indigo-950/80 px-2.5 py-1 rounded-md border border-indigo-500/30">
+                    🔀 Comparar
+                  </span>
+                  {activeExplorationTab === 'compare' ? <ChevronUp className="w-4 h-4 text-indigo-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </div>
+
+                <h3 className="font-bold text-base text-white mb-1">
+                  Comparar Cenários
+                </h3>
+
+                <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                  Coloque duas simulações lado a lado (Cenário A vs B) e veja a diferença exata.
+                </p>
+
+                <div className="p-3 rounded-xl bg-slate-900/90 border border-indigo-500/40 text-xs text-indigo-300 font-semibold flex items-center justify-between">
+                  <span>Simulação A vs B</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-indigo-400" />
+                </div>
+              </button>
+
+              {/* Card 3: Definir uma meta */}
+              <button
+                onClick={() => setActiveExplorationTab(activeExplorationTab === 'goals' ? null : 'goals')}
+                className={`p-5 rounded-2xl border text-left transition-all relative overflow-hidden group ${
+                  activeExplorationTab === 'goals'
+                    ? 'bg-amber-600/30 border-amber-400 ring-2 ring-amber-400/50'
+                    : 'bg-slate-800/80 border-slate-700 hover:border-amber-500/60 hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-md border border-amber-500/30">
+                    🎯 Metas
+                  </span>
+                  {activeExplorationTab === 'goals' ? <ChevronUp className="w-4 h-4 text-amber-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </div>
+
+                <h3 className="font-bold text-base text-white mb-1">
+                  Definir uma Meta
+                </h3>
+
+                <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                  Descubra quanto precisa aportar por mês ou quanto tempo levaria para chegar a R$ 100.000.
+                </p>
+
+                <div className="p-3 rounded-xl bg-slate-900/90 border border-amber-500/40 text-xs text-amber-300 font-semibold flex items-center justify-between">
+                  <span>Alcançar R$ 100.000</span>
+                  <Target className="w-3.5 h-3.5 text-amber-400" />
+                </div>
+              </button>
+
+            </div>
+
+            {/* EXPANDED PANELS (Progressive Disclosure - Point 3) */}
+
+            {/* Painel 1: E se...? */}
+            {activeExplorationTab === 'whatif' && (
+              <div className="pt-4 border-t border-slate-700/80 space-y-4 animate-fadeIn">
+                <h4 className="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-sky-400" />
+                  E se você alterar algumas variáveis? (Simulação rápida)
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {whatIfOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setValorInicialStr(String(opt.params.valorInicial));
+                        setAporteMensalStr(String(opt.params.aporteMensal));
+                        setTaxaJurosStr(String(opt.params.taxaJuros));
+                        setPeriodoStr(String(opt.params.periodo));
+                        handlePerformCalculation();
+                      }}
+                      className="p-4 rounded-xl border border-slate-700 bg-slate-800/90 hover:bg-sky-950/60 hover:border-sky-400 text-left transition-all group"
+                    >
+                      <span className="text-xs font-bold text-white block group-hover:text-sky-300 mb-1">
+                        {opt.label}
+                      </span>
+                      <span className="text-xs font-extrabold text-emerald-400 block mb-2">
+                        +{formatBRL(opt.diffAmount)} no final
+                      </span>
+                      <span className="text-[11px] font-bold text-sky-400 hover:underline flex items-center gap-1">
+                        Ver esse cenário <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Painel 2: Comparar Cenários */}
+            {activeExplorationTab === 'compare' && (
+              <div className="pt-4 border-t border-slate-700/80 space-y-4 text-slate-900 animate-fadeIn">
+                <div className="flex items-center justify-between text-white">
+                  <h4 className="text-sm font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                    <Split className="w-4 h-4 text-indigo-400" />
+                    Comparativo Lado a Lado (Cenário A x Cenário B)
+                  </h4>
+                  <span className="text-xs font-bold text-indigo-200 bg-indigo-950 px-2.5 py-1 rounded-md border border-indigo-500/40">
+                    {scenarioComparison.summaryText}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  {/* Cenário A */}
+                  <div className="p-4 rounded-xl bg-white border border-slate-200">
+                    <span className="text-xs font-extrabold uppercase text-sky-700 bg-sky-100 px-2 py-0.5 rounded mb-2 inline-block">
+                      Cenário A (Atual)
+                    </span>
+                    <div className="text-xs text-slate-600 space-y-1 mb-3">
+                      <div>Inicial: {formatBRL(parseBrazilianNumber(paramsA.valorInicial))} | Aporte: {formatBRL(parseBrazilianNumber(paramsA.aporteMensal))}/mês</div>
+                      <div>Taxa: {formatPercent(parseBrazilianNumber(paramsA.taxaJuros))} | Prazo: {paramsA.periodo} {paramsA.tipoPeriodo}</div>
+                    </div>
+                    <div className="pt-2 border-t border-slate-100 space-y-1 text-xs">
+                      <div>Investido: <strong>{formatBRL(scenarioComparison.scenarioA.totalInvested)}</strong></div>
+                      <div>Juros: <strong className="text-emerald-600">+{formatBRL(scenarioComparison.scenarioA.totalInterest)}</strong></div>
+                      <div className="text-sm font-extrabold text-slate-900 pt-1">
+                        Final: {formatBRL(scenarioComparison.scenarioA.totalFinal)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cenário B */}
+                  <div className="p-4 rounded-xl bg-white border border-indigo-200 shadow-xs">
+                    <span className="text-xs font-extrabold uppercase text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded mb-2 inline-block">
+                      Cenário B (Comparação)
+                    </span>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Aporte Mensal (R$)</label>
+                        <input
+                          type="text"
+                          value={scenarioBAporteMensal}
+                          onChange={(e) => setScenarioBAporteMensal(e.target.value)}
+                          className="w-full p-1.5 bg-slate-50 border border-slate-200 rounded font-bold"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Prazo ({tipoPeriodo})</label>
+                        <input
+                          type="text"
+                          value={scenarioBPeriodo}
+                          onChange={(e) => setScenarioBPeriodo(e.target.value)}
+                          className="w-full p-1.5 bg-slate-50 border border-slate-200 rounded font-bold"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 space-y-1 text-xs">
+                      <div>Investido: <strong>{formatBRL(scenarioComparison.scenarioB.totalInvested)}</strong></div>
+                      <div>Juros: <strong className="text-emerald-600">+{formatBRL(scenarioComparison.scenarioB.totalInterest)}</strong></div>
+                      <div className="text-sm font-extrabold text-indigo-700 pt-1">
+                        Final: {formatBRL(scenarioComparison.scenarioB.totalFinal)}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+            {/* Painel 3: Definir uma Meta */}
+            {activeExplorationTab === 'goals' && (
+              <div className="pt-4 border-t border-slate-700/80 space-y-4 text-slate-900 animate-fadeIn">
+                <div className="flex items-center gap-2 text-white">
+                  <Target className="w-5 h-5 text-amber-400" />
+                  <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider">
+                    Simulador de Meta Financeira
+                  </h4>
+                </div>
+
+                <div className="max-w-xs">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Meta Desejada (R$)
+                  </label>
+                  <input
+                    type="text"
+                    value={metaValorStr}
+                    onChange={(e) => setMetaValorStr(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-white border border-amber-300 font-extrabold text-base text-slate-900"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1.5">
+                    <h5 className="font-bold text-slate-900 text-sm">
+                      Modo A: Mantendo o aporte atual ({formatBRL(parseBrazilianNumber(paramsA.aporteMensal))}/mês)
+                    </h5>
+                    <p className="text-slate-600">{goalResult.modoAMensagem}</p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1.5">
+                    <h5 className="font-bold text-slate-900 text-sm">
+                      Modo B: Aporte necessário para meta em {paramsA.periodo} {paramsA.tipoPeriodo}
+                    </h5>
+                    <p className="text-slate-600">{goalResult.modoBMensagem}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* 5. ENTENDA SEU RESULTADO */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs leading-relaxed text-slate-700">
-              <h3 className="font-bold text-slate-900 text-sm mb-1 flex items-center gap-1.5">
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs text-xs leading-relaxed text-slate-700">
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-sky-600" />
                 Entenda seu Resultado
               </h3>
               <p>{resultA.textEntendaSeuResultado}</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 text-xs leading-relaxed text-slate-700">
-              <h3 className="font-bold text-emerald-900 text-sm mb-1 flex items-center gap-1.5">
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs text-xs leading-relaxed text-slate-700">
+              <h3 className="font-bold text-emerald-900 text-sm mb-1.5 flex items-center gap-1.5">
                 <TrendingUp className="w-4 h-4 text-emerald-600" />
                 Quanto os juros fizeram por você?
               </h3>
@@ -674,189 +935,9 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             </div>
           </div>
 
-          {/* Visual Composition Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs font-bold text-slate-700">
-              <span>Composição do Saldo Final</span>
-              <span>
-                {formatPercent(resultA.percentInvested, 0)} Investimento x {formatPercent(resultA.percentInterest, 0)} Juros
-              </span>
-            </div>
-            <div className="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
-              <div
-                style={{ width: `${Math.max(0, Math.min(100, resultA.percentInvested))}%` }}
-                className="bg-sky-500 h-full transition-all duration-300"
-                title="Total Investido"
-              />
-              <div
-                style={{ width: `${Math.max(0, Math.min(100, resultA.percentInterest))}%` }}
-                className="bg-emerald-500 h-full transition-all duration-300"
-                title="Juros compostos acumulados"
-              />
-            </div>
-            <div className="flex flex-wrap items-center gap-6 text-xs text-slate-500 pt-1">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-sky-500"></span>
-                <span>Total Investido ({formatBRL(resultA.totalInvested)})</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-                <span>Juros Ganhos ({formatBRL(resultA.totalInterest)})</span>
-              </div>
-            </div>
-          </div>
-
-          {/* "E se você mudar algumas coisas?" (Quick What-Ifs) */}
-          <div className="pt-6 border-t border-slate-100">
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3">
-              E se você mudar algumas coisas? (Testar outros cenários com 1 clique)
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {whatIfOptions.map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => {
-                    setValorInicialStr(String(opt.params.valorInicial));
-                    setAporteMensalStr(String(opt.params.aporteMensal));
-                    setTaxaJurosStr(String(opt.params.taxaJuros));
-                    setPeriodoStr(String(opt.params.periodo));
-                    handlePerformCalculation();
-                  }}
-                  className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-sky-50 hover:border-sky-300 text-left transition-all group shadow-2xs"
-                >
-                  <span className="text-xs font-bold text-slate-800 block group-hover:text-sky-600 mb-0.5">
-                    {opt.label}
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600">
-                    +{formatBRL(opt.diffAmount)} no saldo final
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* MODO COMPARAR CENÁRIOS */}
-          {showCompareMode && (
-            <div className="pt-6 border-t border-slate-200 bg-indigo-50/40 p-6 rounded-2xl border">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Split className="w-5 h-5 text-indigo-600" />
-                  <h3 className="font-bold text-slate-900 text-base">
-                    Comparação de Cenários (Cenário A x Cenário B)
-                  </h3>
-                </div>
-                <span className="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-1 rounded-md">
-                  {scenarioComparison.summaryText}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Cenário A */}
-                <div className="p-4 rounded-xl bg-white border border-slate-200">
-                  <span className="text-xs font-extrabold uppercase text-sky-700 bg-sky-100 px-2 py-0.5 rounded mb-2 inline-block">
-                    Cenário A (Atual)
-                  </span>
-                  <div className="text-xs text-slate-600 space-y-1 mb-3">
-                    <div>Inicial: {formatBRL(parseBrazilianNumber(paramsA.valorInicial))} | Aporte: {formatBRL(parseBrazilianNumber(paramsA.aporteMensal))}/mês</div>
-                    <div>Taxa: {formatPercent(parseBrazilianNumber(paramsA.taxaJuros))} | Prazo: {paramsA.periodo} {paramsA.tipoPeriodo}</div>
-                  </div>
-                  <div className="pt-2 border-t border-slate-100 space-y-1 text-xs">
-                    <div>Investido: <strong>{formatBRL(scenarioComparison.scenarioA.totalInvested)}</strong></div>
-                    <div>Juros: <strong className="text-emerald-600">+{formatBRL(scenarioComparison.scenarioA.totalInterest)}</strong></div>
-                    <div className="text-sm font-extrabold text-slate-900 pt-1">
-                      Final: {formatBRL(scenarioComparison.scenarioA.totalFinal)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Cenário B */}
-                <div className="p-4 rounded-xl bg-white border border-indigo-200 shadow-xs">
-                  <span className="text-xs font-extrabold uppercase text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded mb-2 inline-block">
-                    Cenário B (Comparação)
-                  </span>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Aporte Mensal (R$)</label>
-                      <input
-                        type="text"
-                        value={scenarioBAporteMensal}
-                        onChange={(e) => setScenarioBAporteMensal(e.target.value)}
-                        className="w-full p-1.5 bg-slate-50 border border-slate-200 rounded font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Prazo ({tipoPeriodo})</label>
-                      <input
-                        type="text"
-                        value={scenarioBPeriodo}
-                        onChange={(e) => setScenarioBPeriodo(e.target.value)}
-                        className="w-full p-1.5 bg-slate-50 border border-slate-200 rounded font-bold"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-100 space-y-1 text-xs">
-                    <div>Investido: <strong>{formatBRL(scenarioComparison.scenarioB.totalInvested)}</strong></div>
-                    <div>Juros: <strong className="text-emerald-600">+{formatBRL(scenarioComparison.scenarioB.totalInterest)}</strong></div>
-                    <div className="text-sm font-extrabold text-indigo-700 pt-1">
-                      Final: {formatBRL(scenarioComparison.scenarioB.totalFinal)}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-          {/* METAS FINANCEIRAS WIDGET */}
-          {showGoalsWidget && (
-            <div className="pt-6 border-t border-slate-200 bg-amber-50/50 p-6 rounded-2xl border border-amber-200">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-amber-600" />
-                <h3 className="font-bold text-slate-900 text-base">
-                  Quanto preciso investir para atingir minha meta?
-                </h3>
-              </div>
-
-              <div className="max-w-xs mb-4">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Meta Desejada (R$)
-                </label>
-                <input
-                  type="text"
-                  value={metaValorStr}
-                  onChange={(e) => setMetaValorStr(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-white border border-amber-300 font-extrabold text-base text-slate-900"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                
-                {/* Modo A */}
-                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1.5">
-                  <h4 className="font-bold text-slate-900 text-sm">
-                    Modo A: Mantendo o aporte atual ({formatBRL(parseBrazilianNumber(paramsA.aporteMensal))}/mês)
-                  </h4>
-                  <p className="text-slate-600">{goalResult.modoAMensagem}</p>
-                </div>
-
-                {/* Modo B */}
-                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1.5">
-                  <h4 className="font-bold text-slate-900 text-sm">
-                    Modo B: Aporte necessário para meta em {paramsA.periodo} {paramsA.tipoPeriodo}
-                  </h4>
-                  <p className="text-slate-600">{goalResult.modoBMensagem}</p>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-          {/* Interactive SVG Evolution Chart with Tooltip */}
-          <div className="pt-6 border-t border-slate-100">
-            <div className="flex items-center justify-between mb-4">
+          {/* 6. GRÁFICO INTERATIVO */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <BarChart2 className="w-4 h-4 text-sky-600" />
                 Gráfico Interativo de Evolução Patrimonial
@@ -865,7 +946,6 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80">
-              
               {activeChartPoint !== null && resultA.yearlyBreakdown[activeChartPoint] && (
                 <div className="mb-3 p-3 rounded-xl bg-slate-900 text-white text-xs flex items-center justify-between shadow-md">
                   <div>
@@ -906,9 +986,9 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             </div>
           </div>
 
-          {/* Breakdown Table */}
-          <div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+          {/* 7. TABELA DE EVOLUÇÃO */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <Layers className="w-4 h-4 text-sky-600" />
                 Tabela de Evolução ({tabelaModo === 'anual' ? 'Resumo Anual' : 'Mês a Mês'})
@@ -976,31 +1056,52 @@ export default function JurosCompostosCalculator({ initialSearchParams }: JurosC
             </div>
           </div>
 
-          {/* Ver Fórmula Utilizada */}
-          <div className="pt-4 border-t border-slate-100">
+          {/* 8. AÇÕES SECUNDÁRIAS (Copiar Resultado, Compartilhar, Ver Fórmula) */}
+          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCopySummary}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors flex items-center gap-1.5"
+                title="Copiar texto resumo formatado"
+              >
+                {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedSuccess ? 'Copiado!' : 'Copiar Resultado'}
+              </button>
+
+              <button
+                onClick={handleShareURL}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors flex items-center gap-1.5"
+                title="Gerar link compartilhável desta simulação"
+              >
+                {shareSuccess ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+                {shareSuccess ? 'Link Copiado!' : 'Compartilhar Cálculo'}
+              </button>
+            </div>
+
             <button
               onClick={() => setShowFormula(!showFormula)}
-              className="text-xs font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1.5"
+              className="text-xs font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1"
             >
               {showFormula ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              {showFormula ? 'Ocultar Fórmula e Detalhes Acadêmicos' : 'Ver Fórmula Utilizada'}
+              {showFormula ? 'Ocultar Fórmula' : 'Ver Fórmula Utilizada'}
             </button>
-
-            {showFormula && (
-              <div className="mt-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 text-slate-600">
-                <p className="font-bold text-slate-900">Fórmula de Juros Compostos com Aportes Postcipados:</p>
-                <div className="p-3 bg-white border border-slate-200 rounded-lg font-mono text-[11px] text-center font-bold">
-                  M = P × (1 + i)^n + PMT × [ ((1 + i)^n - 1) / i ]
-                </div>
-                <p>
-                  <strong>Consideração dos Aportes:</strong> Os depósitos são efetuados no último dia de cada período (postcipados), não rendendo juros no próprio mês de aporte.
-                </p>
-                <p>
-                  <strong>Equivalência de Taxas:</strong> <code className="bg-slate-200 px-1 rounded">i_m = (1 + i_a)^(1/12) - 1</code>
-                </p>
-              </div>
-            )}
           </div>
+
+          {/* Detalhes da Fórmula (Se expandido) */}
+          {showFormula && (
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 text-slate-600">
+              <p className="font-bold text-slate-900">Fórmula de Juros Compostos com Aportes Postcipados:</p>
+              <div className="p-3 bg-white border border-slate-200 rounded-lg font-mono text-[11px] text-center font-bold">
+                M = P × (1 + i)^n + PMT × [ ((1 + i)^n - 1) / i ]
+              </div>
+              <p>
+                <strong>Consideração dos Aportes:</strong> Os depósitos são efetuados no último dia de cada período (postcipados), não rendendo juros no próprio mês de aporte.
+              </p>
+              <p>
+                <strong>Equivalência de Taxas:</strong> <code className="bg-slate-200 px-1 rounded">i_m = (1 + i_a)^(1/12) - 1</code>
+              </p>
+            </div>
+          )}
 
         </div>
       )}
